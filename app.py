@@ -1,21 +1,42 @@
-import os
-import pandas as pd
+"""
+Sportapp – Platzreservierung
+
+Starten mit:  streamlit run app.py
+
+Ablauf:  Schritt 1 (Datum/Uhrzeit)  ->  Schritt 2 (Platzwahl)  ->  Schritt 3 (Name/E-Mail)
+"""
+
 import streamlit as st
 
+from datum import zeige_schritt1
+from platzwahl import zeige_schritt2
+from name import zeige_bestaetigung, zeige_schritt3
+
+st.set_page_config(page_title="Sportapp", layout="centered")
 st.title("Sportapp")
-st.write("Es funktioniert!")
 
-DATEI = "ausgaben.csv"
+# Aktuellen Schritt merken (1, 2, 3 oder 4 = Bestätigung)
+if "schritt" not in st.session_state:
+    st.session_state.schritt = 1
 
-def lade_ausgaben():
-    if os.path.exists(DATEI):
-        return pd.read_csv(DATEI)
-    return pd.DataFrame(columns=["datum", "betrag", "kategorie"])
+# Sicherheit: Man kommt nur zu einem Schritt, wenn die Angaben davor vorhanden sind
+if st.session_state.schritt >= 2 and "datum" not in st.session_state:
+    st.session_state.schritt = 1
+if st.session_state.schritt == 3 and not st.session_state.get("gewaehlter_platz"):
+    st.session_state.schritt = 2
 
-def speichere_ausgaben(df):
-    df.to_csv(DATEI, index=False)
+schritt = st.session_state.schritt
 
-# Tabelle testen
-df = lade_ausgaben()
-st.subheader("Deine Ausgaben-Liste")
-st.dataframe(df)
+# Fortschrittsanzeige
+TITEL = {1: "Datum und Uhrzeit", 2: "Platzwahl", 3: "Verifikation"}
+if schritt in TITEL:
+    st.progress(schritt / 3, text=f"Schritt {schritt} von 3: {TITEL[schritt]}")
+
+if schritt == 1:
+    zeige_schritt1()
+elif schritt == 2:
+    zeige_schritt2()
+elif schritt == 3:
+    zeige_schritt3()
+else:
+    zeige_bestaetigung()
