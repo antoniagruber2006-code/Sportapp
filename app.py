@@ -1,6 +1,6 @@
+
 """
 PlatzPilot – Platzreservierung
-
 Starten mit: streamlit run app.py
 """
 
@@ -12,31 +12,28 @@ from name import zeige_bestaetigung, zeige_schritt3
 from admin import zeige_admin
 
 
+# Seiteneinstellungen
 st.set_page_config(
     page_title="🎾 PlatzPilot",
     layout="centered"
 )
 
 
-# ======================================
 # DESIGN
-# ======================================
-
 st.markdown("""
 <style>
-
-    /* Deploy und Streamlit-Menü ausblenden */
+    /* Streamlit-Menü ausblenden */
     [data-testid="stToolbar"] {
         display: none;
     }
 
-    /* Hintergrund */
+    /* Hintergrund und Textfarbe */
     .stApp {
         background-color: #F2F8F2;
         color: #173B29;
     }
 
-    /* Breite und Abstand der Seite */
+    /* Seitenbreite und Abstände */
     .block-container {
         max-width: 850px;
         padding-top: 2.5rem;
@@ -143,7 +140,7 @@ st.markdown("""
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
 
-    /* Anpassung für Smartphones */
+    /* Smartphone-Ansicht */
     @media (max-width: 600px) {
         .banner-text {
             max-width: 65%;
@@ -161,33 +158,29 @@ st.markdown("""
             right: 25px;
         }
     }
-
 </style>
 """, unsafe_allow_html=True)
 
 
-# ======================================
 # ADMIN-ANMELDUNG
-# ======================================
 
+# Anmeldestatus speichern
 if "admin_angemeldet" not in st.session_state:
     st.session_state.admin_angemeldet = False
 
-
 # Adminzugang oben rechts
-links, rechts = st.columns([3, 1])
+linke_spalte, rechte_spalte = st.columns([3, 1])
 
-with rechts:
+with rechte_spalte:
     if not st.session_state.admin_angemeldet:
-
         with st.popover("Admin anmelden"):
-            passwort = st.text_input(
+            admin_passwort = st.text_input(
                 "Passwort",
                 type="password"
             )
 
             if st.button("Anmelden"):
-                if passwort == "platzpilot123":
+                if admin_passwort == "platzpilot123":
                     st.session_state.admin_angemeldet = True
                     st.rerun()
                 else:
@@ -201,53 +194,48 @@ with rechts:
             st.rerun()
 
 
-# Angemeldete Admins können den Bereich auswählen
+# Navigation für angemeldete Administratoren
 if st.session_state.admin_angemeldet:
-    seite = st.sidebar.radio(
+    ausgewaehlte_seite = st.sidebar.radio(
         "Bereich auswählen",
         ["Reservierung", "Adminbereich"]
     )
 else:
-    seite = "Reservierung"
+    ausgewaehlte_seite = "Reservierung"
 
 
-# ======================================
 # ADMINBEREICH
-# ======================================
-
-if seite == "Adminbereich":
+if ausgewaehlte_seite == "Adminbereich":
     zeige_admin()
 
 
-# ======================================
 # RESERVIERUNG
-# ======================================
-
 else:
     st.title("🎾 PlatzPilot")
     st.write("Dein Platz. Dein Match. Deine Zeit.")
 
-    # Aktuellen Schritt merken
+    # Aktuellen Reservierungsschritt speichern
     if "schritt" not in st.session_state:
         st.session_state.schritt = 1
 
-    # Prüfen, ob die Angaben der vorherigen Schritte vorhanden sind
+    # Fehlende Datumsangabe prüfen
     if (
         st.session_state.schritt >= 2
         and "datum" not in st.session_state
     ):
         st.session_state.schritt = 1
 
+    # Fehlende Platzauswahl prüfen
     if (
         st.session_state.schritt == 3
         and not st.session_state.get("gewaehlter_platz")
     ):
         st.session_state.schritt = 2
 
-    schritt = st.session_state.schritt
+    aktueller_schritt = st.session_state.schritt
 
-    # Tennis-Grafik nur auf der ersten Seite anzeigen
-    if schritt == 1:
+    # Tennis-Banner nur beim ersten Schritt anzeigen
+    if aktueller_schritt == 1:
         st.markdown(
             """
 <div class="tennis-banner">
@@ -262,27 +250,30 @@ else:
             unsafe_allow_html=True
         )
 
-    TITEL = {
+    SCHRITT_TITEL = {
         1: "Datum und Uhrzeit",
         2: "Platzwahl",
         3: "Verifikation"
     }
 
-    # Fortschritt anzeigen
-    if schritt in TITEL:
+    # Fortschritt der Reservierung anzeigen
+    if aktueller_schritt in SCHRITT_TITEL:
         st.progress(
-            schritt / 3,
-            text=f"Schritt {schritt} von 3: {TITEL[schritt]}"
+            aktueller_schritt / 3,
+            text=(
+                f"Schritt {aktueller_schritt} von 3: "
+                f"{SCHRITT_TITEL[aktueller_schritt]}"
+            )
         )
 
-    # Gewählten Schritt anzeigen
-    if schritt == 1:
+    # Passende Reservierungsseite öffnen
+    if aktueller_schritt == 1:
         zeige_schritt1()
 
-    elif schritt == 2:
+    elif aktueller_schritt == 2:
         zeige_schritt2()
 
-    elif schritt == 3:
+    elif aktueller_schritt == 3:
         zeige_schritt3()
 
     else:
