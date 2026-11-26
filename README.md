@@ -11,7 +11,7 @@ PlatzPilot ist eine Sportplatz-Reservierungsapp. Die Nutzer können Datum, Uhrze
 ### Funktion Admin:
 - Reservierungen löschen
 - Reservierungen ändern
-- Übersicht aller Reservierungen
+- Übersicht über alle Reservierungen
 
 ## Repository klonen:
 ```bash
