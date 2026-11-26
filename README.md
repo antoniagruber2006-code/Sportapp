@@ -4,8 +4,9 @@
 PlatzPilot ist eine Sportplatz-Reservierungsapp. Die Nutzer können Datum, Uhrzeit und einen verfügbaren Tennisplatz auswählen und reservieren. Ein Adminbereich ermöglicht die Verwaltung der Reservierungen. 
 
 Installation:
+```bash
 pip install -r requirements.txt
-
+```
 Starten:
 streamlit run app.py
 
